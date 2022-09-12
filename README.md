@@ -8,7 +8,7 @@
 A simple scraper to scrape news archives from https://www.oneindia.com in a few low resource languages for use in NLP research/projects.
 
 # How it works
-Takes in the language and save directory as arguments (defaults to current directory)
+Takes in the language and save directory(defaults to current directory) as arguments. Language arguments are listed below.
 <ul>
   <li>malayalam</li>
   <li>telugu</li>
