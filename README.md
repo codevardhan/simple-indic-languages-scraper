@@ -12,8 +12,9 @@ A simple scraper to scrape news archives from https://www.oneindia.com in a few 
 ```bash
 python3 main.py malayalam ./
 ```
+This command stores the raw news data in a file "monolingial.ml" in the current directory.
 # How it works
-Takes in the language and save directory(defaults to current directory) as arguments. Language arguments are listed below.
+Takes in the language and save directory (defaults to current directory) as arguments. Language arguments are listed below.
 <ul>
   <li>malayalam</li>
   <li>telugu</li>
