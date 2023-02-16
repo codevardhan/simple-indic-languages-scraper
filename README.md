@@ -7,6 +7,11 @@
 
 A simple scraper to scrape news archives from https://www.oneindia.com in a few low resource languages for use in NLP research/projects.
 
+# Usage
+
+```bash
+python3 main.py malayalam ./
+```
 # How it works
 Takes in the language and save directory(defaults to current directory) as arguments. Language arguments are listed below.
 <ul>
