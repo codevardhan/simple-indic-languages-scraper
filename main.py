@@ -6,6 +6,8 @@ import os
 from tqdm import tqdm, trange
 from datetime import date, timedelta
 from argparse import ArgumentParser
+import ssl
+
 
 CODES = {
     "telugu": "te",
@@ -25,6 +27,7 @@ def daterange(start_date, end_date):
 
 
 def get_data(url, lang, save_dir):
+    header = {'User-Agent': 'Mozilla/5.0'}
     url = url.replace("language", args.lang)
     end_date = date(2022, 4, 1)
     start_date = date(2000, 5, 1)
@@ -32,8 +35,7 @@ def get_data(url, lang, save_dir):
     for single_date in daterange(start_date, end_date):
         url_end = single_date.strftime("%Y-%m-%d").replace("-", "/") + "/"
         page_url = url + url_end
-        print(page_url)
-        main_soup = BeautifulSoup(requests.get(page_url).content, features="html5lib")
+        main_soup = BeautifulSoup(requests.get(page_url, headers=header).content, features="html5lib")
         check = main_soup.find_all("section")
         if "Page not found" not in check:
             for elem in main_soup.findAll("ul", attrs={"class": "dayindexTitles"}):
@@ -41,7 +43,7 @@ def get_data(url, lang, save_dir):
                     doc_data = ""
                     news_url = url + elem.a.attrs["href"]
                     news_soup = BeautifulSoup(
-                        requests.get(news_url).content, features="html5lib"
+                        requests.get(news_url, headers=header).content, features="html5lib"
                     )
                     for elem in news_soup.findAll("p"):
                         doc_data += str(elem).replace("\n", "")
@@ -53,7 +55,7 @@ def get_data(url, lang, save_dir):
 if __name__ == "__main__":
     url = "https://language.oneindia.com/"
     parser = ArgumentParser(
-        description="Creating a scraper for getting news data from oneindia.com, in the preferred language.",
+        description="Creating a scraper for getting news data from oneindia.com, in the preferred language. Eg. python3 main.py malayalam ./ ",
         epilog="Use the data well! :)",
     )
 
