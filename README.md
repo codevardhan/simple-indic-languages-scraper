@@ -22,7 +22,7 @@ python3 main.py -l malayalam
 This command stores the structured news data in a csv file "malayalam_data.csv" in the current directory. The articles selected from would be from 2000/05/01 to the current date.
 
 ```bash
-python3 main.py malayalam -s 2023/02/01 -e 2023/02/20 -f text -sa ./output/
+python3 main.py -l malayalam -s 2023/02/01 -e 2023/02/20 -f text -sa ./output/
 ```
 
 This command stores the raw news data in a file "monolingual.ml" in a directory named "output". The articles selected from would be from 2023/02/01 to 2023/02/20.
