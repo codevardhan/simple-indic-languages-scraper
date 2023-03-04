@@ -28,15 +28,15 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 
-def get_data(url, lang, save_dir, dates=(date(2000, 5, 1), date(2022, 4, 1))):
+def get_data(url, lang, save_dir, dates):
     header = {"User-Agent": "Mozilla/5.0"}
     url = url.replace("language", args.lang)
     start_date = dates[0]
     end_date = dates[1]
     data = []
     for single_date in daterange(start_date, end_date):
-        url_end = single_date.strftime("%Y-%m-%d").replace("-", "/") + "/"
-        page_url = url + url_end
+        url_end = single_date.strftime("%Y/%m/%d")
+        page_url = url + url_end + "/"
         main_soup = BeautifulSoup(
             requests.get(page_url, headers=header).content, features="html5lib"
         )
@@ -68,23 +68,18 @@ def get_data(url, lang, save_dir, dates=(date(2000, 5, 1), date(2022, 4, 1))):
 
 
 def get_structured_data(
-    url, lang, save_dir, dates=(date(2000, 5, 1), date(2022, 4, 1))
-):
+    url, lang, save_dir, dates):
     header = {"User-Agent": "Mozilla/5.0"}
     url = url.replace("language", lang)
     start_date = dates[0]
     end_date = dates[1]
 
-    if isinstance(start_date, str) or isinstance(end_date, str):
-        start_date = datetime.strptime(start_date, "%d/%m/%Y").date()
-        end_date = datetime.strptime(end_date, "%d/%m/%Y").date()
         
     for single_date in daterange(start_date, end_date):
         data_dict = {}
         data_df = pd.DataFrame()
-        url_end = single_date.strftime("%Y-%m-%d").replace("-", "/") + "/"
-        page_url = url + url_end
-        page_url = "https://malayalam.oneindia.com/2022/02/01/"
+        url_end = single_date.strftime("%Y/%m/%d")
+        page_url = url + url_end + "/"
         main_soup = BeautifulSoup(
             requests.get(page_url, headers=header).content, features="html5lib"
         )
@@ -105,8 +100,6 @@ def get_structured_data(
                         doc_data += (
                             str(elem)
                             .replace("\n", "")
-                            .replace("<p>", "")
-                            .replace("<\\p>", "")
                         )
                     data_dict["date"] = single_date
                     data_dict["news_data"] = doc_data
@@ -119,6 +112,7 @@ def get_structured_data(
                     )
                 index += 1
             output_path = os.path.join(save_dir, f"{lang}_data.csv")
+
             if not os.path.exists(output_path) or os.stat(output_path).st_size == 0:
                 data_df.to_csv(output_path, mode="w", index=False)
             else:
@@ -126,19 +120,19 @@ def get_structured_data(
 
 
 if __name__ == "__main__":
-    url = "https://language.oneindia.com"
+    url = "https://language.oneindia.com/"
     parser = ArgumentParser(
         description="Creating a scraper for getting news data from oneindia.com, in the preferred language. Eg. python3 main.py malayalam ./ ",
         epilog="Use the data well! :)",
     )
 
-    def dir_path(string):
+    def valid_path(string):
         if os.path.isdir(string):
             return string
         else:
             raise NotADirectoryError(string)
 
-    def def_lang(string):
+    def valid_lang(string):
         if string in CODES.keys():
             return string
         else:
@@ -148,22 +142,24 @@ if __name__ == "__main__":
 
     def valid_date(s):
         try:
-            return datetime.strptime(s, "%Y-%m-%d").strftime("%d/%m/%Y")
+            return datetime.strptime(s, "%Y/%m/%d")
         except ValueError:
             msg = "Not a valid date: {0!r}".format(s)
             raise argparse.ArgumentTypeError(msg)
 
     parser.add_argument(
-        "lang",
+        "-l",
+        "--lang",
         metavar="lang",
-        type=def_lang,
+        type=valid_lang,
         help="The language in which the news article should be scraped. Supported languages - hindi, malayalam, telugu, tamil, kannada, odia, bengali, gujarati",
     )
 
     parser.add_argument(
+        "-sa",
         "--save_dir",
         metavar="save_dir",
-        type=dir_path,
+        type=valid_path,
         required=False,
         default=".",
         help="The location where the data should be saved",
@@ -173,8 +169,8 @@ if __name__ == "__main__":
         "-s",
         "--start_date",
         metavar="start_date",
-        help="The start date - format YYYY-MM-DD",
-        default = datetime.now().date().strftime("%d/%m/%Y"),
+        help="The start date - format YYYY/MM/DD",
+        default="2000/05/01",
         required=False,
         type=valid_date,
     )
@@ -183,8 +179,8 @@ if __name__ == "__main__":
         "-e",
         "--end_date",
         metavar="end_date",
-        help="The end date - format YYYY-MM-DD",
-        default="2000-05-01",
+        help="The end date - format YYYY/MM/DD",
+        default = datetime.now().date().strftime("%Y/%m/%d"),
         required=False,
         type=valid_date,
     )
