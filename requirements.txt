@@ -3,3 +3,4 @@ tqdm
 argparse
 bs4
 html5lib
+pandas
