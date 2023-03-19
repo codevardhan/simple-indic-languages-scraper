@@ -89,11 +89,20 @@ def get_structured_data(
                 topics.append(elem.string)
             index = 0
             for elem in main_soup.findAll("ul", attrs={"class": "dayindexTitles"}):
-                if elem.a:
+                li_elements = elem.find_all('li')
+                news_url_values = [li.find('a')['href'] for li in li_elements]
+                for news_article_link in news_url_values:
                     doc_data = ""
-                    news_url = url + elem.a.attrs["href"]
+                    news_url = url + news_article_link
+                    try:
+                        news_page_data = requests.get(news_url, headers=header).content
+                    except requests.exceptions.TooManyRedirects:
+                        print(f"Too many redirects occurred while trying to access the page {news_url}.")
+                        continue
+                    
+                    news_page_data = requests.get(news_url, headers=header).content
                     news_soup = BeautifulSoup(
-                        requests.get(news_url, headers=header).content,
+                        news_page_data,
                         features="html5lib",
                     )
                     for elem in news_soup.findAll("p"):
